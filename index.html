@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOU ARE CHEF - MADE BY ÂQÎB</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Cinzel"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @keyframes progress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+    .animate-progress {
+      animation: progress 8s linear forwards;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+    }
+    .dark .glass {
+      background: rgba(24, 24, 27, 0.75);
+      backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-100 min-h-screen font-sans antialiased transition-colors duration-300">
+
+  <!-- ================= 8-SECOND SPLASH SCREEN ================= -->
+  <div id="splashScreen" class="fixed inset-0 z-50 bg-zinc-950 flex flex-col items-center justify-center p-6 text-center select-none">
+    <div class="relative mb-6">
+      <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center shadow-2xl shadow-orange-500/30 animate-bounce">
+        <i data-lucide="utensils-crossed" class="w-12 h-12 text-white"></i>
+      </div>
+    </div>
+    
+    <h1 class="font-display text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 tracking-wider mb-2">
+      YOU ARE CHEF
+    </h1>
+    
+    <p class="font-black tracking-widest text-orange-400 text-sm sm:text-base uppercase my-3 drop-shadow">
+      MADE BY ÂQÎB
+    </p>
+
+    <div class="w-64 sm:w-80 h-2 bg-zinc-800 rounded-full overflow-hidden mt-8 shadow-inner">
+      <div class="h-full bg-gradient-to-r from-orange-500 to-amber-400 animate-progress"></div>
+    </div>
+    <p class="text-xs text-zinc-500 mt-3 font-medium tracking-wide">Preheating kitchen... 8s</p>
+  </div>
+
+  <!-- ================= MAIN APP ================= -->
+  <div id="mainApp" class="hidden min-h-screen flex flex-col max-w-5xl mx-auto px-4 sm:px-6 py-6">
+    
+    <!-- Navbar -->
+    <header class="glass sticky top-4 z-40 rounded-2xl px-6 py-4 flex items-center justify-between border border-slate-200/60 dark:border-zinc-800 shadow-sm mb-8">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
+          <i data-lucide="chef-hat" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="font-display font-bold text-lg leading-none tracking-tight">YOU ARE CHEF</h2>
+          <span class="text-[10px] font-extrabold text-orange-500 tracking-wider">MADE BY ÂQÎB</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Language Selector Button -->
+        <button id="langToggleBtn" onclick="toggleLanguage()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-xs font-bold hover:bg-slate-200 dark:hover:bg-zinc-700 transition">
+          <i data-lucide="languages" class="w-4 h-4 text-orange-500"></i>
+          <span id="currentLangLabel">ENGLISH</span>
+        </button>
+
+        <!-- Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition">
+          <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow space-y-8">
+      
+      <!-- Input Card -->
+      <section class="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-zinc-800 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-6">
+        <div>
+          <h1 id="titleTxt" class="text-2xl sm:text-3xl font-bold tracking-tight mb-1">What ingredients do you have?</h1>
+          <p id="subTxt" class="text-sm text-slate-500 dark:text-zinc-400">Add household daily ingredients or fridge items to generate recipes.</p>
+        </div>
+
+        <!-- Add Input Bar -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-grow">
+            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+            <input type="text" id="ingInput" placeholder="e.g. Eggs, Tomato, Milk, Chicken..." 
+                   class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-orange-500/50 text-sm font-medium transition"
+                   onkeydown="if(event.key==='Enter') addIngredient()" />
+          </div>
+          <button onclick="addIngredient()" id="addBtnTxt" class="px-6 py-3.5 bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-bold text-sm hover:opacity-90 active:scale-95 transition flex items-center justify-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add
+          </button>
+        </div>
+
+        <!-- Selected Tags Container -->
+        <div id="selectedContainer" class="hidden space-y-2">
+          <span id="selectedLabel" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Ingredients:</span>
+          <div id="tagList" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="space-y-3 pt-2">
+          <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-orange-500"></i>
+            <span id="suggLabel">Quick Suggestions:</span>
+          </div>
+          <div id="suggestionsBox" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- RECIPE BNAO Button -->
+        <div class="pt-4">
+          <button onclick="generateRecipes()" id="generateBtn" class="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-2xl font-bold text-lg shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.01] active:scale-[0.99] transition flex items-center justify-center gap-3">
+            <i data-lucide="wand-2" class="w-6 h-6"></i>
+            <span id="btnBnaoTxt">RECIPE BNAO!</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Loading State -->
+      <div id="loadingBox" class="hidden py-16 text-center space-y-4">
+        <div class="inline-block p-4 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-500 animate-spin">
+          <i data-lucide="loader-2" class="w-8 h-8"></i>
+        </div>
+        <p id="loadingTxt" class="text-slate-600 dark:text-zinc-400 font-medium text-sm">AI Chef is cooking best recipes for you...</p>
+      </div>
+
+      <!-- Recipes Output Grid -->
+      <section id="recipesContainer" class="hidden space-y-6">
+        <h2 id="recipesResultHeader" class="text-xl font-bold tracking-tight">Generated Recipes</h2>
+        <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-6 border-t border-slate-200 dark:border-zinc-800 text-center text-xs text-slate-400 dark:text-zinc-500">
+      <p>© 2026 YOU ARE CHEF — ALL RIGHTS RESERVED. <span class="font-bold text-orange-500">MADE BY ÂQÎB</span></p>
+    </footer>
+  </div>
+
+  <script>
+    // State
+    let currentLang = 'en'; // 'en' or 'ur' (Roman Urdu)
+    let selectedIngredients = [];
+
+    const i18n = {
+      en: {
+        title: "What ingredients do you have?",
+        sub: "Add household daily ingredients or fridge items to generate recipes.",
+        inputPlaceholder: "e.g. Eggs, Tomato, Milk, Chicken...",
+        addBtn: "Add",
+        selectedLabel: "Your Ingredients:",
+        suggLabel: "Quick Suggestions:",
+        btnBnao: "RECIPE BNAO!",
+        loadingTxt: "AI Chef is crafting best recipes & plating guides...",
+        resultsHeader: "Generated Recipes for You",
+        time: "Time",
+        calories: "Calories",
+        difficulty: "Difficulty",
+        ingredients: "Ingredients Needed",
+        steps: "Instructions",
+        plating: "Plating & Presentation Tip",
+        langName: "ENGLISH",
+        suggestions: ["Eggs", "Tomato", "Milk", "Onion", "Potato", "Cheese", "Chicken", "Rice", "Bread", "Garlic"]
+      },
+      ur: {
+        title: "Aapke paas kya ingredients hain?",
+        sub: "Ghar ya fridge ke ingredients add karein aur zabardast recipes banayein.",
+        inputPlaceholder: "Jaise: Anda, Tamatar, Doodh, Chicken...",
+        addBtn: "Add Karein",
+        selectedLabel: "Aapke Ingredients:",
+        suggLabel: "Zaroori Items:",
+        btnBnao: "RECIPE BNAO!",
+        loadingTxt: "AI Chef aapke liye best recipes aur plating tips tayar kar raha hai...",
+        resultsHeader: "Tayar Shuda Recipes",
+        time: "Waqt",
+        calories: "Calories",
+        difficulty: "Mushkil Level",
+        ingredients: "Zaroori Cheezein",
+        steps: "Banane Ka Tarika",
+        plating: "Plate Mein Kaise Sajayein (Plating Tip)",
+        langName: "ROMAN URDU",
+        suggestions: ["Anda", "Tamatar", "Doodh", "Pyaaz", "Aloo", "Cheese", "Chicken", "Chawal", "Bread", "Lehsan"]
+      }
+    };
+
+    // Splash Screen Handler (8 Seconds)
+    window.addEventListener('load', () => {
+      lucide.createIcons();
+      renderSuggestions();
+      
+      setTimeout(() => {
+        const splash = document.getElementById('splashScreen');
+        const main = document.getElementById('mainApp');
+        
+        splash.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+        setTimeout(() => {
+          splash.classList.add('hidden');
+          main.classList.remove('hidden');
+        }, 500);
+      }, 8000); // 8 Seconds
+    });
+
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    // Language Toggle
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'ur' : 'en';
+      document.getElementById('currentLangLabel').innerText = i18n[currentLang].langName;
+      document.getElementById('titleTxt').innerText = i18n[currentLang].title;
+      document.getElementById('subTxt').innerText = i18n[currentLang].sub;
+      document.getElementById('ingInput').placeholder = i18n[currentLang].inputPlaceholder;
+      document.getElementById('addBtnTxt').childNodes[2].textContent = " " + i18n[currentLang].addBtn;
+      document.getElementById('selectedLabel').innerText = i18n[currentLang].selectedLabel;
+      document.getElementById('suggLabel').innerText = i18n[currentLang].suggLabel;
+      document.getElementById('btnBnaoTxt').innerText = i18n[currentLang].btnBnao;
+      document.getElementById('loadingTxt').innerText = i18n[currentLang].loadingTxt;
+      document.getElementById('recipesResultHeader').innerText = i18n[currentLang].resultsHeader;
+      
+      renderSuggestions();
+    }
+
+    // Suggestions Render
+    function renderSuggestions() {
+      const box = document.getElementById('suggestionsBox');
+      box.innerHTML = '';
+      i18n[currentLang].suggestions.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = "px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white transition cursor-pointer";
+        btn.innerText = "+ " + item;
+        btn.onclick = () => {
+          if (!selectedIngredients.includes(item)) {
+            selectedIngredients.push(item);
+            renderTags();
+          }
+        };
+        box.appendChild(btn);
+      });
+    }
+
+    // Add Ingredient Manual
+    function addIngredient() {
+      const input = document.getElementById('ingInput');
+      const val = input.value.trim();
+      if (val && !selectedIngredients.includes(val)) {
+        selectedIngredients.push(val);
+        input.value = '';
+        renderTags();
+      }
+    }
+
+    // Render Tags
+    function renderTags() {
+      const container = document.getElementById('selectedContainer');
+      const tagList = document.getElementById('tagList');
+      tagList.innerHTML = '';
+
+      if (selectedIngredients.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      selectedIngredients.forEach((item, index) => {
+        const tag = document.createElement('span');
+        tag.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 font-bold text-xs";
+        tag.innerHTML = `${item} <i data-lucide="x" class="w-3.5 h-3.5 cursor-pointer hover:opacity-75" onclick="removeTag(${index})"></i>`;
+        tagList.appendChild(tag);
+      });
+      lucide.createIcons();
+    }
+
+    function removeTag(index) {
+      selectedIngredients.splice(index, 1);
+      renderTags();
+    }
+
+    // AI Recipe Generator Mock Fallback + AI Visuals
+    async function generateRecipes() {
+      if (selectedIngredients.length === 0) {
+        alert(currentLang === 'en' ? "Please add at least one ingredient!" : "Kharaye karam kam se kam ek ingredient add karein!");
+        return;
+      }
+
+      const loadingBox = document.getElementById('loadingBox');
+      const recipesContainer = document.getElementById('recipesContainer');
+      const recipesGrid = document.getElementById('recipesGrid');
+
+      recipesContainer.classList.add('hidden');
+      loadingBox.classList.remove('hidden');
+
+      // Dynamic AI Dish Generation Engine
+      setTimeout(() => {
+        const recipes = createMockRecipes(selectedIngredients, currentLang);
+        recipesGrid.innerHTML = '';
+
+        recipes.forEach(rec => {
+          const card = document.createElement('div');
+          card.className = "bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-zinc-800 shadow-lg flex flex-col justify-between";
+          
+          card.innerHTML = `
+            <div>
+              <div class="relative h-48 w-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
+                <img src="${rec.imageUrl}" alt="${rec.title}" class="w-full h-full object-cover transition transform hover:scale-105 duration-500" loading="lazy" />
+                <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-xs uppercase tracking-wider">
+                  ${rec.type}
+                </span>
+              </div>
+              <div class="p-6 space-y-4">
+                <h3 class="text-xl font-bold tracking-tight">${rec.title}</h3>
+                
+                <div class="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-zinc-400 border-y border-slate-100 dark:border-zinc-800/80 py-3">
+                  <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4 text-orange-500"></i> ${rec.time}</span>
+                  <span class="flex items-center gap-1"><i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> ${rec.calories}</span>
+                  <span class="flex items-center gap-1"><i data-lucide="gauge" class="w-4 h-4 text-orange-500"></i> ${rec.difficulty}</span>
+                </div>
+
+                <div>
+                  <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">${i18n[currentLang].ingredients}:</h4>
+                  <p class="text-sm text-slate-600 dark:text-zinc-300 font-medium">${rec.ingredients.join(', ')}</p>
+                </div>
+
+                <div>
+                  <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">${i18n[currentLang].steps}:</h4>
+                  <ol class="list-decimal list-inside space-y-1 text-sm text-slate-600 dark:text-zinc-300 font-medium">
+                    ${rec.steps.map(s => `<li>${s}</li>`).join('')}
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 pt-0">
+              <div class="p-4 rounded-2xl bg-orange-50 dark:bg-orange-950/30 border border-orange-100 dark:border-orange-900/40 text-xs space-y-1">
+                <span class="font-bold text-orange-600 dark:text-orange-400 flex items-center gap-1.5">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i> ${i18n[currentLang].plating}
+                </span>
+                <p class="text-slate-600 dark:text-zinc-300 font-medium leading-relaxed">${rec.plating}</p>
+              </div>
+            </div>
+          `;
+          recipesGrid.appendChild(card);
+        });
+
+        lucide.createIcons();
+        loadingBox.classList.add('hidden');
+        recipesContainer.classList.remove('hidden');
+        recipesContainer.scrollIntoView({ behavior: 'smooth' });
+      }, 1500);
+    }
+
+    // Generator Helper
+    function createMockRecipes(ingList, lang) {
+      const items = ingList.join(', ');
+      
+      if (lang === 'ur') {
+        return [
+          {
+            title: `Special ${ingList[0] || 'Chef'} Delight Bowl`,
+            type: "Quick & Easy",
+            time: "15-20 Mins",
+            calories: "320 kcal",
+            difficulty: "Easy",
+            ingredients: [items, "Namak", "Kali Mirch", "Olive Oil"],
+            steps: [
+              "Sabhi ingredients ko achhi tarah wash karke cut kar lein.",
+              "Pan mein thoda oil garam karein aur lightly fry karein.",
+              "Masale add karke 5 min tak pakaayein aur hot serve karein."
+            ],
+            plating: "Ek ghole white ceramic plate mein center par rakhein, upar se halka hara dhania ya seasoning sprinkle karein.",
+            imageUrl: `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80`
+          },
+          {
+            title: `Gourmet ${ingList[0] || 'Kitchen'} Fusion Plate`,
+            type: "Chef Special",
+            time: "25-30 Mins",
+            calories: "450 kcal",
+            difficulty: "Medium",
+            ingredients: [items, "Butter", "Garlic", "Oregano"],
+            steps: [
+              "Pan mein butter aur lehsan ko saute karein.",
+              "Ingredients daal kar medium aanch par cook karein.",
+              "Crispy texture aane tak roast karein."
+            ],
+            plating: "Wide flat plate use karein. Side par thodi sauce dhar kar spoon se spread karein aur dish ko center mein elevate karke sajaayein.",
+            imageUrl: `https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80`
+          }
+        ];
+      }
+
+      return [
+        {
+          title: `Pan-Seared ${ingList[0] || 'Chef'} Medley`,
+          type: "Quick & Easy",
+          time: "15-20 Mins",
+          calories: "320 kcal",
+          difficulty: "Easy",
+          ingredients: [items, "Salt", "Black Pepper", "Olive Oil"],
+          steps: [
+            "Wash and chop all ingredients evenly.",
+            "Heat olive oil in a pan and lightly sauté.",
+            "Season with salt and pepper, serve hot."
+          ],
+          plating: "Serve in a shallow dark ceramic bowl, garnished with microgreens and a drizzle of extra virgin olive oil.",
+          imageUrl: `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80`
+        },
+        {
+          title: `Gourmet ${ingList[0] || 'Kitchen'} Fusion Plate`,
+          type: "Chef Special",
+          time: "25-30 Mins",
+          calories: "450 kcal",
+          difficulty: "Medium",
+          ingredients: [items, "Butter", "Garlic", "Oregano"],
+          steps: [
+            "Sauté garlic in butter until aromatic.",
+            "Add main ingredients and cook on medium flame.",
+            "Roast until crisp and golden brown."
+          ],
+          plating: "Plate on a wide porcelain dish. Create a sauce swoop on the side and stack ingredients neatly in the center for depth.",
+          imageUrl: `https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80`
+        }
+      ];
+    }
+  </script>
+</body>
+</html>
