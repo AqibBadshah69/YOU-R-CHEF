@@ -1,510 +1,1129 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YOU ARE CHEF - MADE BY ÂQÎB</title>
-  
-  <!-- Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#fff7ed',
-              100: '#ffedd5',
-              500: '#f97316',
-              600: '#ea580c',
-              700: '#c2410c',
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Inventory & Budget Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        culinary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
             }
-          },
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            display: ['"Cinzel"', 'serif'],
-          }
         }
-      }
-    }
-  </script>
-  
-  <style>
-    @keyframes progress {
-      0% { width: 0%; }
-      100% { width: 100%; }
-    }
-    .animate-progress {
-      animation: progress 8s linear forwards;
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(12px);
-    }
-    .dark .glass {
-      background: rgba(24, 24, 27, 0.75);
-      backdrop-filter: blur(12px);
-    }
-  </style>
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-100 min-h-screen font-sans antialiased transition-colors duration-300">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-  <!-- ================= 8-SECOND SPLASH SCREEN ================= -->
-  <div id="splashScreen" class="fixed inset-0 z-50 bg-zinc-950 flex flex-col items-center justify-center p-6 text-center select-none">
-    <div class="relative mb-6">
-      <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center shadow-2xl shadow-orange-500/30 animate-bounce">
-        <i data-lucide="utensils-crossed" class="w-12 h-12 text-white"></i>
-      </div>
-    </div>
-    
-    <h1 class="font-display text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 tracking-wider mb-2">
-      YOU ARE CHEF
-    </h1>
-    
-    <p class="font-black tracking-widest text-orange-400 text-sm sm:text-base uppercase my-3 drop-shadow">
-      MADE BY ÂQÎB
-    </p>
+    <!-- Top Navigation Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
+                        <i class="fa-solid font-bold fa-utensils text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-xl text-slate-900 tracking-tight">Kitchen<span class="text-orange-600">Pulse</span></span>
+                        <span class="hidden sm:inline-block text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-2">Inventory & Budget</span>
+                    </div>
+                </div>
 
-    <div class="w-64 sm:w-80 h-2 bg-zinc-800 rounded-full overflow-hidden mt-8 shadow-inner">
-      <div class="h-full bg-gradient-to-r from-orange-500 to-amber-400 animate-progress"></div>
-    </div>
-    <p class="text-xs text-zinc-500 mt-3 font-medium tracking-wide">Preheating kitchen... 8s</p>
-  </div>
+                <!-- Navigation Tabs -->
+                <nav class="flex space-x-1 sm:space-x-4 items-center">
+                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-orange-600 bg-orange-50">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span class="hidden md:inline">Dashboard</span>
+                    </button>
+                    <button onclick="switchTab('inventory')" id="tab-inventory" class="tab-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span class="hidden md:inline">Inventory & Expenses</span>
+                    </button>
+                    <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span class="hidden md:inline">Budget & Data</span>
+                    </button>
+                </nav>
 
-  <!-- ================= MAIN APP ================= -->
-  <div id="mainApp" class="hidden min-h-screen flex flex-col max-w-5xl mx-auto px-4 sm:px-6 py-6">
-    
-    <!-- Header Navbar -->
-    <header class="glass sticky top-4 z-40 rounded-2xl px-6 py-4 flex items-center justify-between border border-slate-200/60 dark:border-zinc-800 shadow-sm mb-8">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white shadow-md shadow-orange-500/20">
-          <i data-lucide="chef-hat" class="w-6 h-6"></i>
+                <!-- Action Controls -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="openItemModal()" class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-3.5 py-2 rounded-xl text-sm transition shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="hidden sm:inline">Add Item</span>
+                    </button>
+                </div>
+            </div>
         </div>
-        <div>
-          <h2 class="font-display font-bold text-lg leading-none tracking-tight">YOU ARE CHEF</h2>
-          <span class="text-[10px] font-extrabold text-orange-500 tracking-wider">MADE BY ÂQÎB</span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <!-- Language Selector -->
-        <button id="langToggleBtn" onclick="toggleLanguage()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-xs font-bold hover:bg-slate-200 dark:hover:bg-zinc-700 transition">
-          <i data-lucide="languages" class="w-4 h-4 text-orange-500"></i>
-          <span id="currentLangLabel">ENGLISH</span>
-        </button>
-
-        <!-- Dark Mode Toggle -->
-        <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition">
-          <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
-          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
-        </button>
-      </div>
     </header>
 
-    <!-- Main Section -->
-    <main class="flex-grow space-y-8">
-      
-      <!-- Input Card -->
-      <section class="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-zinc-800 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-6">
-        <div>
-          <h1 id="titleTxt" class="text-2xl sm:text-3xl font-bold tracking-tight mb-1">What ingredients do you have?</h1>
-          <p id="subTxt" class="text-sm text-slate-500 dark:text-zinc-400">Add household daily ingredients or fridge items to generate AI recipes.</p>
+    <!-- Global Restock Alert Banner -->
+    <div id="restock-alert-banner" class="hidden bg-amber-500 text-white px-4 py-2.5 shadow-inner">
+        <div class="max-w-7xl mx-auto flex items-center justify-between text-sm font-medium">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-triangle-exclamation text-amber-100"></i>
+                <span id="restock-alert-text">Attention: You have items running low in stock!</span>
+            </div>
+            <button onclick="switchTab('inventory'); setStockFilter('low');" class="bg-white/20 hover:bg-white/30 text-white text-xs px-3 py-1 rounded-md transition font-semibold">
+                View Low Stock Items
+            </button>
         </div>
+    </div>
 
-        <!-- Add Input Bar -->
-        <div class="flex flex-col sm:flex-row gap-3">
-          <div class="relative flex-grow">
-            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
-            <input type="text" id="ingInput" placeholder="e.g. Eggs, Tomato, Milk, Chicken..." 
-                   class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-orange-500/50 text-sm font-medium transition"
-                   onkeydown="if(event.key==='Enter') addIngredient()" />
-          </div>
-          <button onclick="addIngredient()" id="addBtnTxt" class="px-6 py-3.5 bg-slate-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-bold text-sm hover:opacity-90 active:scale-95 transition flex items-center justify-center gap-2">
-            <i data-lucide="plus" class="w-4 h-4"></i> Add
-          </button>
-        </div>
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- Selected Ingredients Tags -->
-        <div id="selectedContainer" class="hidden space-y-2">
-          <span id="selectedLabel" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Ingredients:</span>
-          <div id="tagList" class="flex flex-wrap gap-2"></div>
-        </div>
+        <!-- TAB 1: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6">
+            
+            <!-- Quick Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Stat Card 1 -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Monthly Budget</p>
+                        <h3 class="text-2xl font-extrabold text-slate-900 mt-1" id="stat-budget">$0.00</h3>
+                        <p class="text-xs text-slate-500 mt-1" id="stat-month-label">Current Month</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
 
-        <!-- Suggestions Chips -->
-        <div class="space-y-3 pt-2">
-          <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-orange-500"></i>
-            <span id="suggLabel">Quick Suggestions:</span>
-          </div>
-          <div id="suggestionsBox" class="flex flex-wrap gap-2"></div>
-        </div>
+                <!-- Stat Card 2 -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Spent This Month</p>
+                        <h3 class="text-2xl font-extrabold text-slate-900 mt-1" id="stat-spent">$0.00</h3>
+                        <p class="text-xs font-semibold mt-1" id="stat-budget-status">0% of budget</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl" id="spent-icon-container">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                </div>
 
-        <!-- RECIPE BNAO AI Button -->
-        <div class="pt-4">
-          <button onclick="generateRecipesWithAI()" id="generateBtn" class="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-2xl font-bold text-lg shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.01] active:scale-[0.99] transition flex items-center justify-center gap-3">
-            <i data-lucide="wand-2" class="w-6 h-6"></i>
-            <span id="btnBnaoTxt">RECIPE BNAO!</span>
-          </button>
-        </div>
-      </section>
+                <!-- Stat Card 3 -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Inventory Items</p>
+                        <h3 class="text-2xl font-extrabold text-slate-900 mt-1" id="stat-total-items">0</h3>
+                        <p class="text-xs text-slate-500 mt-1" id="stat-categories-count">0 Categories</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-cubes"></i>
+                    </div>
+                </div>
 
-      <!-- Loading State Indicator -->
-      <div id="loadingBox" class="hidden py-16 text-center space-y-4">
-        <div class="inline-block p-4 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-500 animate-spin">
-          <i data-lucide="loader-2" class="w-8 h-8"></i>
-        </div>
-        <p id="loadingTxt" class="text-slate-600 dark:text-zinc-400 font-medium text-sm">Gemini AI is crafting unique recipes & plating guides...</p>
-      </div>
+                <!-- Stat Card 4 -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Restock Needed</p>
+                        <h3 class="text-2xl font-extrabold text-amber-600 mt-1" id="stat-low-stock">0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Items below threshold</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    </div>
+                </div>
+            </div>
 
-      <!-- Recipes Container Grid -->
-      <section id="recipesContainer" class="hidden space-y-6">
-        <h2 id="recipesResultHeader" class="text-xl font-bold tracking-tight">AI Generated Recipes</h2>
-        <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-      </section>
+            <!-- Budget Progress Bar -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-2">
+                <div class="flex justify-between items-center text-sm font-semibold">
+                    <span class="text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high text-orange-500"></i> Monthly Spend Progress
+                    </span>
+                    <span id="budget-progress-text" class="text-slate-600">$0 / $0</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                    <div id="budget-progress-bar" class="bg-orange-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between items-center text-xs text-slate-400">
+                    <span>0%</span>
+                    <span id="budget-remaining-text">Remaining: $0.00</span>
+                    <span>100%</span>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Doughnut Chart: Category Spending -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-orange-500"></i> Category Spending
+                        </h3>
+                        <span class="text-xs font-medium text-slate-400">This Month</span>
+                    </div>
+                    <div class="relative flex-1 min-h-[260px] flex items-center justify-center">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart: Top Spent Items -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-bar text-orange-500"></i> Top Expenses by Item
+                        </h3>
+                        <span class="text-xs font-medium text-slate-400">Top 5 Highest Cost</span>
+                    </div>
+                    <div class="relative flex-1 min-h-[260px] flex items-center justify-center">
+                        <canvas id="topItemsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions / Quick Inventory Table -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-orange-500"></i> Recently Added Grocery Items
+                    </h3>
+                    <button onclick="switchTab('inventory')" class="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+                        View All <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-xs font-semibold uppercase text-slate-400 border-b border-slate-100">
+                            <tr>
+                                <th class="px-5 py-3">Item Name</th>
+                                <th class="px-5 py-3">Category</th>
+                                <th class="px-5 py-3">Stock Level</th>
+                                <th class="px-5 py-3">Cost</th>
+                                <th class="px-5 py-3">Purchased</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-items-tbody" class="divide-y divide-slate-100">
+                            <!-- Dynamically Filled -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 2: INVENTORY & EXPENSES -->
+        <section id="view-inventory" class="hidden space-y-6">
+            
+            <!-- Filter & Search Bar -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row gap-3 justify-between items-center">
+                <!-- Search Input -->
+                <div class="relative w-full md:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="search-input" oninput="renderInventoryTable()" placeholder="Search items..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition">
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    <!-- Category Filter -->
+                    <select id="filter-category" onchange="renderInventoryTable()" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="ALL">All Categories</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Dairy">Dairy</option>
+                        <option value="Meat">Meat & Seafood</option>
+                        <option value="Spices">Spices & Condiments</option>
+                        <option value="Bakery">Bakery</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Staples">Grains & Staples</option>
+                    </select>
+
+                    <!-- Stock Status Filter -->
+                    <select id="filter-stock" onchange="renderInventoryTable()" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="ALL">All Stock Levels</option>
+                        <option value="IN_STOCK">In Stock</option>
+                        <option value="LOW_STOCK">Low Stock Alert</option>
+                        <option value="OUT_OF_STOCK">Out of Stock</option>
+                    </select>
+
+                    <!-- Reset Filters -->
+                    <button onclick="resetFilters()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inventory Main Table -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-50 text-xs font-semibold uppercase text-slate-400 border-b border-slate-100">
+                            <tr>
+                                <th class="px-5 py-3.5">Item Name</th>
+                                <th class="px-5 py-3.5">Category</th>
+                                <th class="px-5 py-3.5">Quantity</th>
+                                <th class="px-5 py-3.5">Cost</th>
+                                <th class="px-5 py-3.5">Purchase Date</th>
+                                <th class="px-5 py-3.5">Status</th>
+                                <th class="px-5 py-3.5 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-tbody" class="divide-y divide-slate-100">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Empty State -->
+                <div id="empty-inventory-state" class="hidden p-12 text-center">
+                    <div class="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto text-2xl mb-3">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-800">No Grocery Items Found</h4>
+                    <p class="text-sm text-slate-500 max-w-sm mx-auto mt-1">Start by adding your kitchen inventory or load sample data to explore analytics.</p>
+                    <div class="mt-4 flex justify-center gap-3">
+                        <button onclick="openItemModal()" class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-xl text-sm transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Add First Item
+                        </button>
+                        <button onclick="loadSampleData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2 rounded-xl text-sm transition">
+                            Load Demo Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 3: BUDGET & DATA SETTINGS -->
+        <section id="view-settings" class="hidden space-y-6 max-w-4xl mx-auto">
+            
+            <!-- Budget Configuration Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">Monthly Grocery Budget</h3>
+                        <p class="text-xs text-slate-500">Set your spending threshold to receive warning alerts when expenses run high.</p>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row gap-3 items-end">
+                    <div class="w-full flex-1">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Monthly Budget Limit ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">$</span>
+                            <input type="number" id="setting-budget-input" step="10" min="0" placeholder="e.g. 500" class="w-full pl-8 pr-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <button onclick="saveBudgetSetting()" class="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-sm text-sm">
+                        Save Budget
+                    </button>
+                </div>
+            </div>
+
+            <!-- Data Management Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">Data Management & Backup</h3>
+                        <p class="text-xs text-slate-500">Manage your local data storage, import/export backups, or reset defaults.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <!-- Load Sample Data -->
+                    <button onclick="loadSampleData()" class="p-4 border border-slate-200 rounded-xl hover:border-orange-300 hover:bg-orange-50/50 transition text-left group">
+                        <i class="fa-solid fa-wand-magic-sparkles text-orange-500 text-lg mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-slate-800 text-sm">Load Sample Data</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Populate pre-made kitchen items & realistic spending.</p>
+                    </button>
+
+                    <!-- Export Backup -->
+                    <button onclick="exportDataJSON()" class="p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/50 transition text-left group">
+                        <i class="fa-solid fa-file-export text-blue-500 text-lg mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-slate-800 text-sm">Export Data (JSON)</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Download a backup file of your inventory.</p>
+                    </button>
+
+                    <!-- Import Backup -->
+                    <label class="p-4 border border-slate-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50/50 transition text-left group cursor-pointer block">
+                        <i class="fa-solid fa-file-import text-emerald-500 text-lg mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-slate-800 text-sm">Import Data</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Restore data from a JSON backup file.</p>
+                        <input type="file" id="import-json-file" accept=".json" onchange="importDataJSON(event)" class="hidden">
+                    </label>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                    <span class="text-xs text-slate-400">Want to start completely fresh?</span>
+                    <button onclick="clearAllData()" class="text-xs text-red-600 hover:text-red-700 font-semibold hover:underline">
+                        Clear All Data
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-16 py-6 border-t border-slate-200 dark:border-zinc-800 text-center text-xs text-slate-400 dark:text-zinc-500">
-      <p>© 2026 YOU ARE CHEF — ALL RIGHTS RESERVED. <span class="font-bold text-orange-500">MADE BY ÂQÎB</span></p>
-    </footer>
-  </div>
+    <!-- Modal: Add / Edit Item -->
+    <div id="item-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <!-- Modal Header -->
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 id="modal-title" class="font-bold text-slate-800 text-lg">Add Grocery Item</h3>
+                <button onclick="closeItemModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-  <script>
-    // Embedded Gemini API Key Configuration
-    const GEMINI_API_KEY = "AIzaSy..." + "D3vKeyConfigured"; // Pre-configured key slot
+            <!-- Modal Form -->
+            <form id="item-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="item-id">
 
-    let currentLang = 'en'; // 'en' or 'ur' (Roman Urdu)
-    let selectedIngredients = [];
+                <!-- Item Name -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Item Name *</label>
+                    <input type="text" id="form-name" required placeholder="e.g. Organic Milk, Tomatoes" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                </div>
 
-    const i18n = {
-      en: {
-        title: "What ingredients do you have?",
-        sub: "Add household daily ingredients or fridge items to generate AI recipes.",
-        inputPlaceholder: "e.g. Eggs, Tomato, Milk, Chicken...",
-        addBtn: "Add",
-        selectedLabel: "Your Ingredients:",
-        suggLabel: "Quick Suggestions:",
-        btnBnao: "RECIPE BNAO!",
-        loadingTxt: "Gemini AI is crafting unique recipes & plating guides...",
-        resultsHeader: "AI Generated Recipes for You",
-        ingredients: "Ingredients Needed",
-        steps: "Instructions",
-        plating: "Plating & Presentation Tip",
-        langName: "ENGLISH",
-        suggestions: ["Eggs", "Tomato", "Milk", "Onion", "Potato", "Cheese", "Chicken", "Rice", "Bread", "Garlic"]
-      },
-      ur: {
-        title: "Aapke paas kya ingredients hain?",
-        sub: "Ghar ya fridge ke ingredients add karein aur AI se zabardast recipes banayein.",
-        inputPlaceholder: "Jaise: Anda, Tamatar, Doodh, Chicken...",
-        addBtn: "Add Karein",
-        selectedLabel: "Aapke Ingredients:",
-        suggLabel: "Zaroori Items:",
-        btnBnao: "RECIPE BNAO!",
-        loadingTxt: "Gemini AI aapke liye bilkul nayi recipes aur plating tips tayar kar raha hai...",
-        resultsHeader: "Tayar Shuda AI Recipes",
-        ingredients: "Zaroori Cheezein",
-        steps: "Banane Ka Tarika",
-        plating: "Plate Mein Kaise Sajayein (Plating Tip)",
-        langName: "ROMAN URDU",
-        suggestions: ["Anda", "Tamatar", "Doodh", "Pyaaz", "Aloo", "Cheese", "Chicken", "Chawal", "Bread", "Lehsan"]
-      }
-    };
+                <!-- Category & Unit Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Category *</label>
+                        <select id="form-category" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Meat">Meat & Seafood</option>
+                            <option value="Spices">Spices & Condiments</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Staples">Grains & Staples</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Unit *</label>
+                        <select id="form-unit" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <option value="kg">kilograms (kg)</option>
+                            <option value="g">grams (g)</option>
+                            <option value="L">liters (L)</option>
+                            <option value="pcs">pieces (pcs)</option>
+                            <option value="packs">packs</option>
+                        </select>
+                    </div>
+                </div>
 
-    // Splash Screen Handler (8 Seconds)
-    window.addEventListener('load', () => {
-      lucide.createIcons();
-      renderSuggestions();
-      
-      setTimeout(() => {
-        const splash = document.getElementById('splashScreen');
-        const main = document.getElementById('mainApp');
-        
-        splash.classList.add('opacity-0', 'transition-opacity', 'duration-500');
-        setTimeout(() => {
-          splash.classList.add('hidden');
-          main.classList.remove('hidden');
-        }, 500);
-      }, 8000);
-    });
+                <!-- Quantity & Min Stock Threshold Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Current Qty *</label>
+                        <input type="number" id="form-quantity" step="0.1" min="0" required placeholder="1" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Min Restock Alert Qty</label>
+                        <input type="number" id="form-min-threshold" step="0.1" min="0" placeholder="0.5" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+                </div>
 
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-    }
+                <!-- Cost & Purchase Date Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Total Cost ($) *</label>
+                        <input type="number" id="form-cost" step="0.01" min="0" required placeholder="0.00" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Purchase Date *</label>
+                        <input type="date" id="form-date" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+                </div>
 
-    function toggleLanguage() {
-      currentLang = currentLang === 'en' ? 'ur' : 'en';
-      document.getElementById('currentLangLabel').innerText = i18n[currentLang].langName;
-      document.getElementById('titleTxt').innerText = i18n[currentLang].title;
-      document.getElementById('subTxt').innerText = i18n[currentLang].sub;
-      document.getElementById('ingInput').placeholder = i18n[currentLang].inputPlaceholder;
-      document.getElementById('addBtnTxt').childNodes[2].textContent = " " + i18n[currentLang].addBtn;
-      document.getElementById('selectedLabel').innerText = i18n[currentLang].selectedLabel;
-      document.getElementById('suggLabel').innerText = i18n[currentLang].suggLabel;
-      document.getElementById('btnBnaoTxt').innerText = i18n[currentLang].btnBnao;
-      document.getElementById('loadingTxt').innerText = i18n[currentLang].loadingTxt;
-      document.getElementById('recipesResultHeader').innerText = i18n[currentLang].resultsHeader;
-      
-      renderSuggestions();
-    }
+                <!-- Action Buttons -->
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeItemModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 text-sm font-medium transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        Save Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    function renderSuggestions() {
-      const box = document.getElementById('suggestionsBox');
-      box.innerHTML = '';
-      i18n[currentLang].suggestions.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = "px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white transition cursor-pointer";
-        btn.innerText = "+ " + item;
-        btn.onclick = () => {
-          if (!selectedIngredients.includes(item)) {
-            selectedIngredients.push(item);
-            renderTags();
-          }
+    <!-- Modal: Consume / Log Usage -->
+    <div id="consume-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-utensils text-orange-500"></i> Log Usage
+                </h3>
+                <button onclick="closeConsumeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="consume-form" onsubmit="handleConsumeSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="consume-item-id">
+                <p id="consume-item-desc" class="text-sm text-slate-600">Enter quantity consumed for this item.</p>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount Used</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="consume-amount" step="0.1" min="0.1" required placeholder="1" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <span id="consume-unit-label" class="text-sm font-semibold text-slate-500 min-w-[40px]">pcs</span>
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeConsumeModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 text-sm font-medium transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        Deduct Stock
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message" class="text-sm font-medium">Notification message</span>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // --- DATA STATE ---
+        let state = {
+            budget: 500,
+            items: []
         };
-        box.appendChild(btn);
-      });
-    }
 
-    function addIngredient() {
-      const input = document.getElementById('ingInput');
-      const val = input.value.trim();
-      if (val && !selectedIngredients.includes(val)) {
-        selectedIngredients.push(val);
-        input.value = '';
-        renderTags();
-      }
-    }
+        // Chart instances
+        let categoryChartInstance = null;
+        let topItemsChartInstance = null;
 
-    function renderTags() {
-      const container = document.getElementById('selectedContainer');
-      const tagList = document.getElementById('tagList');
-      tagList.innerHTML = '';
+        // Category Palette Configuration
+        const categoryColors = {
+            'Vegetables': '#22c55e',
+            'Dairy': '#3b82f6',
+            'Meat': '#ef4444',
+            'Spices': '#f59e0b',
+            'Bakery': '#d97706',
+            'Beverages': '#06b6d4',
+            'Snacks': '#a855f7',
+            'Staples': '#64748b'
+        };
 
-      if (selectedIngredients.length === 0) {
-        container.classList.add('hidden');
-        return;
-      }
+        // Sample initial dataset
+        const sampleItems = [
+            { id: '1', name: 'Organic Milk', category: 'Dairy', quantity: 2, unit: 'L', minThreshold: 1, cost: 6.50, date: getRecentDate(2) },
+            { id: '2', name: 'Fresh Tomatoes', category: 'Vegetables', quantity: 0.5, unit: 'kg', minThreshold: 1, cost: 3.20, date: getRecentDate(1) },
+            { id: '3', name: 'Chicken Breast', category: 'Meat', quantity: 1.5, unit: 'kg', minThreshold: 0.5, cost: 18.00, date: getRecentDate(4) },
+            { id: '4', name: 'Whole Wheat Bread', category: 'Bakery', quantity: 1, unit: 'packs', minThreshold: 1, cost: 2.80, date: getRecentDate(0) },
+            { id: '5', name: 'Olive Oil', category: 'Staples', quantity: 1, unit: 'L', minThreshold: 0.2, cost: 12.50, date: getRecentDate(10) },
+            { id: '6', name: 'Cheddar Cheese', category: 'Dairy', quantity: 0.2, unit: 'kg', minThreshold: 0.3, cost: 5.40, date: getRecentDate(5) },
+            { id: '7', name: 'Basmati Rice', category: 'Staples', quantity: 5, unit: 'kg', minThreshold: 1, cost: 14.99, date: getRecentDate(12) },
+            { id: '8', name: 'Black Pepper', category: 'Spices', quantity: 1, unit: 'pcs', minThreshold: 0.5, cost: 4.10, date: getRecentDate(15) },
+            { id: '9', name: 'Orange Juice', category: 'Beverages', quantity: 2, unit: 'L', minThreshold: 1, cost: 7.00, date: getRecentDate(3) },
+            { id: '10', name: 'Almonds & Nuts', category: 'Snacks', quantity: 0.8, unit: 'kg', minThreshold: 0.2, cost: 11.20, date: getRecentDate(6) }
+        ];
 
-      container.classList.remove('hidden');
-      selectedIngredients.forEach((item, index) => {
-        const tag = document.createElement('span');
-        tag.className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 font-bold text-xs";
-        tag.innerHTML = `${item} <i data-lucide="x" class="w-3.5 h-3.5 cursor-pointer hover:opacity-75" onclick="removeTag(${index})"></i>`;
-        tagList.appendChild(tag);
-      });
-      lucide.createIcons();
-    }
+        function getRecentDate(daysAgo) {
+            const d = new Date();
+            d.setDate(d.getDate() - daysAgo);
+            return d.toISOString().split('T')[0];
+        }
 
-    function removeTag(index) {
-      selectedIngredients.splice(index, 1);
-      renderTags();
-    }
+        // --- LIFECYCLE INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            
+            // Set initial settings budget field
+            document.getElementById('setting-budget-input').value = state.budget;
 
-    // REAL GEMINI AI INTEGRATION CALL
-    async function generateRecipesWithAI() {
-      if (selectedIngredients.length === 0) {
-        alert(currentLang === 'en' ? "Please add at least one ingredient!" : "Meherbani karke kam se kam ek ingredient add karein!");
-        return;
-      }
+            // Set default date input in modal to today
+            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
 
-      const loadingBox = document.getElementById('loadingBox');
-      const recipesContainer = document.getElementById('recipesContainer');
-      const recipesGrid = document.getElementById('recipesGrid');
-
-      recipesContainer.classList.add('hidden');
-      loadingBox.classList.remove('hidden');
-
-      const languagePrompt = currentLang === 'ur' 
-        ? "Respond strictly in Roman Urdu (messaging style Urdu written in English alphabet, e.g. 'Is recipe ko banane ke liye sab se pehle...')."
-        : "Respond in clear English.";
-
-      const prompt = `You are a world-class AI Chef. The user has these ingredients: ${selectedIngredients.join(', ')}.
-Create 2 unique, distinct, delicious recipes using these ingredients.
-${languagePrompt}
-
-Return ONLY valid JSON (no markdown wrapping, no extra text) matching this JSON structure:
-[
-  {
-    "title": "Dish Name",
-    "type": "Category (e.g. Quick & Easy / Gourmet / Healthy)",
-    "time": "e.g. 15 Mins",
-    "calories": "e.g. 350 kcal",
-    "difficulty": "Easy / Medium / Hard",
-    "imageKeyword": "specific culinary dish name in English for image search",
-    "ingredients": ["item 1", "item 2"],
-    "steps": ["Step 1", "Step 2"],
-    "plating": "Detailed advice on how to plate and present this dish beautifully on a plate."
-  }
-]`;
-
-      try {
-        let recipes = [];
-        
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
+            // Render all UI views
+            renderAll();
         });
 
-        const data = await response.json();
-        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        recipes = JSON.parse(cleanJson);
-
-        renderRecipeCards(recipes);
-
-      } catch (err) {
-        console.error("AI Generation Error:", err);
-        const recipes = generateDynamicFallbackRecipes(selectedIngredients, currentLang);
-        renderRecipeCards(recipes);
-      } finally {
-        loadingBox.classList.add('hidden');
-        recipesContainer.classList.remove('hidden');
-        recipesContainer.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    function renderRecipeCards(recipes) {
-      const recipesGrid = document.getElementById('recipesGrid');
-      recipesGrid.innerHTML = '';
-
-      recipes.forEach((rec, idx) => {
-        const query = encodeURIComponent(rec.imageKeyword || rec.title);
-        const imageUrl = `https://source.unsplash.com/featured/800x600/?food,dish,${query}&sig=${idx}_${Date.now()}`;
-        const fallbackImg = `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80`;
-
-        const card = document.createElement('div');
-        card.className = "bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-zinc-800 shadow-lg flex flex-col justify-between hover:shadow-xl transition";
-        
-        card.innerHTML = `
-          <div>
-            <div class="relative h-52 w-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
-              <img src="${imageUrl}" 
-                   onerror="this.src='${fallbackImg}'" 
-                   alt="${rec.title}" 
-                   class="w-full h-full object-cover transition transform hover:scale-105 duration-500" />
-              <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-bold text-xs uppercase tracking-wider">
-                ${rec.type || 'AI Special'}
-              </span>
-            </div>
-            <div class="p-6 space-y-4">
-              <h3 class="text-xl font-bold tracking-tight">${rec.title}</h3>
-              
-              <div class="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-zinc-400 border-y border-slate-100 dark:border-zinc-800/80 py-3">
-                <span class="flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4 text-orange-500"></i> ${rec.time}</span>
-                <span class="flex items-center gap-1"><i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> ${rec.calories}</span>
-                <span class="flex items-center gap-1"><i data-lucide="gauge" class="w-4 h-4 text-orange-500"></i> ${rec.difficulty}</span>
-              </div>
-
-              <div>
-                <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">${i18n[currentLang].ingredients}:</h4>
-                <p class="text-sm text-slate-600 dark:text-zinc-300 font-medium">${Array.isArray(rec.ingredients) ? rec.ingredients.join(', ') : rec.ingredients}</p>
-              </div>
-
-              <div>
-                <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">${i18n[currentLang].steps}:</h4>
-                <ol class="list-decimal list-inside space-y-1 text-sm text-slate-600 dark:text-zinc-300 font-medium">
-                  ${rec.steps.map(s => `<li>${s}</li>`).join('')}
-                </ol>
-              </div>
-            </div>
-          </div>
-
-          <div class="p-6 pt-0">
-            <div class="p-4 rounded-2xl bg-orange-50 dark:bg-orange-950/30 border border-orange-100 dark:border-orange-900/40 text-xs space-y-1">
-              <span class="font-bold text-orange-600 dark:text-orange-400 flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-4 h-4"></i> ${i18n[currentLang].plating}
-              </span>
-              <p class="text-slate-600 dark:text-zinc-300 font-medium leading-relaxed">${rec.plating}</p>
-            </div>
-          </div>
-        `;
-        recipesGrid.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    function generateDynamicFallbackRecipes(ingList, lang) {
-      const items = ingList.join(', ');
-      const mainIng = ingList[0] || 'Chef Item';
-      const secondIng = ingList[1] || 'Fresh Herbs';
-
-      if (lang === 'ur') {
-        return [
-          {
-            title: `Quick ${mainIng} & ${secondIng} Pan Roast`,
-            type: "Asaan & Tez",
-            time: "15 Mins",
-            calories: "290 kcal",
-            difficulty: "Easy",
-            imageKeyword: `${mainIng} dish`,
-            ingredients: [items, "Namak", "Kali Mirch", "Makkhan / Tel"],
-            steps: [
-              `Pehle ${mainIng} aur ${secondIng} ko acche se dho kar chote tukdon mein kaat lein.`,
-              "Pan mein makkhan garam karein aur lehsan ke saath fry karein.",
-              "Masale daal kar 5-7 minute tak light brown hone tak pakayein aur garmagaram serve karein."
-            ],
-            plating: "Gole safaid plate mein darmayan mein rakhein aur upar se bareek katil hui kothmir daal kar garnish karein."
-          },
-          {
-            title: `Special Gourmet ${mainIng} Delight`,
-            type: "Chef Special",
-            time: "25 Mins",
-            calories: "410 kcal",
-            difficulty: "Medium",
-            imageKeyword: `${mainIng} meal`,
-            ingredients: [items, "Cheese", "Oregano", "Zaytoon Ka Tel"],
-            steps: [
-              "Sub ingredients ko ek bowl mein mixing kar ke seasoning add karein.",
-              "Pan mein medium aanch par crispy texture aane tak roast karein.",
-              "Akhir mein melted cheese daal kar 2 min cover kar ke pakaayein."
-            ],
-            plating: "Ek flat dark ceramic plate use karein. Dish ko center mein elevation de kar sajayein aur side par sauce ka drop daal kar phelaayein."
-          }
-        ];
-      }
-
-      return [
-        {
-          title: `Pan-Seared ${mainIng} & ${secondIng}`,
-          type: "Quick & Easy",
-          time: "15 Mins",
-          calories: "290 kcal",
-          difficulty: "Easy",
-          imageKeyword: `${mainIng} dish`,
-          ingredients: [items, "Salt", "Black Pepper", "Butter / Oil"],
-          steps: [
-            `Wash and slice ${mainIng} and ${secondIng} into uniform pieces.`,
-            "Heat butter in a skillet over medium heat.",
-            "Sauté with spices for 5-7 minutes until golden brown and aromatic."
-          ],
-          plating: "Place neatly in the center of a shallow white bowl and sprinkle fresh parsley on top."
-        },
-        {
-          title: `Gourmet ${mainIng} Fusion Bowl`,
-          type: "Chef Special",
-          time: "25 Mins",
-          calories: "410 kcal",
-          difficulty: "Medium",
-          imageKeyword: `${mainIng} meal`,
-          ingredients: [items, "Cheese", "Oregano", "Olive Oil"],
-          steps: [
-            "Toss ingredients in a bowl with seasoning and olive oil.",
-            "Roast on medium flame until crispy and browned.",
-            "Top with cheese and cover for 2 minutes to melt smoothly."
-          ],
-          plating: "Use a wide flat plate. Layer the dish in the center for height and smear sauce elegantly around the rim."
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('kitchen_pulse_data');
+            if (savedData) {
+                try {
+                    state = JSON.parse(savedData);
+                } catch (e) {
+                    console.error("Error reading localStorage:", e);
+                    state = { budget: 500, items: sampleItems };
+                }
+            } else {
+                // Initialize with sample data if first load
+                state = { budget: 500, items: sampleItems };
+                saveToLocalStorage();
+            }
         }
-      ];
-    }
-  </script>
+
+        function saveToLocalStorage() {
+            localStorage.setItem('kitchen_pulse_data', JSON.stringify(state));
+        }
+
+        function renderAll() {
+            updateDashboardStats();
+            renderCharts();
+            renderRecentTable();
+            renderInventoryTable();
+            checkRestockAlerts();
+        }
+
+        // --- NAVIGATION TABS ---
+        function switchTab(tabName) {
+            const tabs = ['dashboard', 'inventory', 'settings'];
+            tabs.forEach(t => {
+                const viewEl = document.getElementById(`view-${t}`);
+                const tabBtn = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    viewEl.classList.remove('hidden');
+                    tabBtn.classList.add('text-orange-600', 'bg-orange-50');
+                    tabBtn.classList.remove('text-slate-600');
+                } else {
+                    viewEl.classList.add('hidden');
+                    tabBtn.classList.remove('text-orange-600', 'bg-orange-50');
+                    tabBtn.classList.add('text-slate-600');
+                }
+            });
+
+            // Re-render charts if entering dashboard to fix sizing glitches
+            if (tabName === 'dashboard') {
+                setTimeout(() => renderCharts(), 50);
+            }
+        }
+
+        // --- DASHBOARD CALCULATIONS & CHARTS ---
+        function updateDashboardStats() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            // Calculate total spent this month
+            const monthItems = state.items.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+            });
+
+            const totalSpentMonth = monthItems.reduce((acc, curr) => acc + (parseFloat(curr.cost) || 0), 0);
+            const totalBudget = parseFloat(state.budget) || 0;
+            const lowStockCount = state.items.filter(item => item.quantity <= (item.minThreshold || 0.5)).length;
+
+            // Update DOM Cards
+            document.getElementById('stat-budget').textContent = `$${totalBudget.toFixed(2)}`;
+            document.getElementById('stat-spent').textContent = `$${totalSpentMonth.toFixed(2)}`;
+            
+            const budgetPercent = totalBudget > 0 ? Math.min(Math.round((totalSpentMonth / totalBudget) * 100), 100) : 0;
+            const budgetStatusEl = document.getElementById('stat-budget-status');
+            budgetStatusEl.textContent = `${budgetPercent}% of monthly budget`;
+            
+            if (totalSpentMonth > totalBudget) {
+                budgetStatusEl.className = "text-xs font-semibold mt-1 text-red-600";
+            } else if (budgetPercent > 85) {
+                budgetStatusEl.className = "text-xs font-semibold mt-1 text-amber-600";
+            } else {
+                budgetStatusEl.className = "text-xs font-semibold mt-1 text-emerald-600";
+            }
+
+            document.getElementById('stat-total-items').textContent = state.items.length;
+            
+            // Unique categories count
+            const categories = new Set(state.items.map(i => i.category));
+            document.getElementById('stat-categories-count').textContent = `${categories.size} Categories`;
+
+            document.getElementById('stat-low-stock').textContent = lowStockCount;
+
+            // Budget progress bar
+            const progressBar = document.getElementById('budget-progress-bar');
+            document.getElementById('budget-progress-text').textContent = `$${totalSpentMonth.toFixed(2)} / $${totalBudget.toFixed(2)}`;
+            
+            const remaining = totalBudget - totalSpentMonth;
+            const remainingEl = document.getElementById('budget-remaining-text');
+            remainingEl.textContent = remaining >= 0 ? `Remaining: $${remaining.toFixed(2)}` : `Over Budget: $${Math.abs(remaining).toFixed(2)}`;
+            
+            const rawWidthPercent = totalBudget > 0 ? (totalSpentMonth / totalBudget) * 100 : 0;
+            progressBar.style.width = `${Math.min(rawWidthPercent, 100)}%`;
+
+            if (rawWidthPercent > 100) {
+                progressBar.className = "bg-red-500 h-3 rounded-full transition-all duration-500";
+            } else if (rawWidthPercent > 85) {
+                progressBar.className = "bg-amber-500 h-3 rounded-full transition-all duration-500";
+            } else {
+                progressBar.className = "bg-orange-500 h-3 rounded-full transition-all duration-500";
+            }
+        }
+
+        function renderCharts() {
+            // Category Spend Aggregation
+            const categoryTotals = {};
+            state.items.forEach(item => {
+                const cost = parseFloat(item.cost) || 0;
+                categoryTotals[item.category] = (categoryTotals[item.category] || 0) + cost;
+            });
+
+            const catLabels = Object.keys(categoryTotals);
+            const catData = Object.values(categoryTotals);
+            const catColors = catLabels.map(c => categoryColors[c] || '#f97316');
+
+            // 1. Category Doughnut Chart
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            categoryChartInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: catLabels.length ? catLabels : ['No Data'],
+                    datasets: [{
+                        data: catData.length ? catData : [1],
+                        backgroundColor: catData.length ? catColors : ['#e2e8f0'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: $${parseFloat(context.raw).toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // 2. Top Expenses Bar Chart
+            const sortedItems = [...state.items].sort((a, b) => b.cost - a.cost).slice(0, 5);
+            const topLabels = sortedItems.map(i => i.name);
+            const topCosts = sortedItems.map(i => i.cost);
+
+            const ctxTop = document.getElementById('topItemsChart').getContext('2d');
+            if (topItemsChartInstance) topItemsChartInstance.destroy();
+
+            topItemsChartInstance = new Chart(ctxTop, {
+                type: 'bar',
+                data: {
+                    labels: topLabels.length ? topLabels : ['No Items'],
+                    datasets: [{
+                        label: 'Cost ($)',
+                        data: topCosts.length ? topCosts : [0],
+                        backgroundColor: '#f97316',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` Cost: $${parseFloat(ctx.raw).toFixed(2)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // --- TABLES RENDERING ---
+        function renderRecentTable() {
+            const tbody = document.getElementById('recent-items-tbody');
+            tbody.innerHTML = '';
+
+            const recent = [...state.items].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+            if (recent.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-5 py-4 text-center text-slate-400 text-xs">No recent inventory items available.</td></tr>`;
+                return;
+            }
+
+            recent.forEach(item => {
+                const isLow = item.quantity <= (item.minThreshold || 0.5);
+                const isOut = item.quantity <= 0;
+
+                let statusBadge = `<span class="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full text-xs font-semibold">In Stock</span>`;
+                if (isOut) {
+                    statusBadge = `<span class="bg-red-50 text-red-600 px-2.5 py-1 rounded-full text-xs font-semibold">Out of Stock</span>`;
+                } else if (isLow) {
+                    statusBadge = `<span class="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full text-xs font-semibold">Low Stock</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="px-5 py-3 font-semibold text-slate-800">${escapeHTML(item.name)}</td>
+                        <td class="px-5 py-3"><span class="bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-md text-xs font-medium">${item.category}</span></td>
+                        <td class="px-5 py-3 font-medium">${item.quantity} ${item.unit}</td>
+                        <td class="px-5 py-3 font-semibold text-slate-900">$${parseFloat(item.cost).toFixed(2)}</td>
+                        <td class="px-5 py-3 text-slate-400 text-xs">${item.date}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-tbody');
+            const emptyState = document.getElementById('empty-inventory-state');
+            tbody.innerHTML = '';
+
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const categoryFilter = document.getElementById('filter-category').value;
+            const stockFilter = document.getElementById('filter-stock').value;
+
+            const filtered = state.items.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.category.toLowerCase().includes(searchTerm);
+                const matchesCategory = categoryFilter === 'ALL' || item.category === categoryFilter;
+                
+                const isLow = item.quantity <= (item.minThreshold || 0.5) && item.quantity > 0;
+                const isOut = item.quantity <= 0;
+                const isIn = !isLow && !isOut;
+
+                let matchesStock = true;
+                if (stockFilter === 'IN_STOCK') matchesStock = isIn;
+                if (stockFilter === 'LOW_STOCK') matchesStock = isLow;
+                if (stockFilter === 'OUT_OF_STOCK') matchesStock = isOut;
+
+                return matchesSearch && matchesCategory && matchesStock;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(item => {
+                const isLow = item.quantity <= (item.minThreshold || 0.5) && item.quantity > 0;
+                const isOut = item.quantity <= 0;
+
+                let statusBadge = `<span class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1"><i class="fa-solid fa-circle text-[8px] text-emerald-500"></i> In Stock</span>`;
+                if (isOut) {
+                    statusBadge = `<span class="bg-red-50 text-red-700 px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1"><i class="fa-solid fa-circle text-[8px] text-red-500"></i> Out of Stock</span>`;
+                } else if (isLow) {
+                    statusBadge = `<span class="bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Low Stock</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="px-5 py-3.5 font-bold text-slate-800">${escapeHTML(item.name)}</td>
+                        <td class="px-5 py-3.5">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-semibold" style="background-color: ${categoryColors[item.category]}15; color: ${categoryColors[item.category]};">
+                                ${item.category}
+                            </span>
+                        </td>
+                        <td class="px-5 py-3.5 font-semibold text-slate-700">${item.quantity} <span class="text-xs text-slate-400 font-normal">${item.unit}</span></td>
+                        <td class="px-5 py-3.5 font-bold text-slate-900">$${parseFloat(item.cost).toFixed(2)}</td>
+                        <td class="px-5 py-3.5 text-slate-500 text-xs">${item.date}</td>
+                        <td class="px-5 py-3.5">${statusBadge}</td>
+                        <td class="px-5 py-3.5 text-right space-x-1">
+                            <button onclick="openConsumeModal('${item.id}')" title="Log Usage" class="p-2 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition">
+                                <i class="fa-solid fa-utensils"></i>
+                            </button>
+                            <button onclick="openItemModal('${item.id}')" title="Edit Item" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteItem('${item.id}')" title="Delete Item" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-category').value = 'ALL';
+            document.getElementById('filter-stock').value = 'ALL';
+            renderInventoryTable();
+        }
+
+        function setStockFilter(type) {
+            if (type === 'low') {
+                document.getElementById('filter-stock').value = 'LOW_STOCK';
+                renderInventoryTable();
+            }
+        }
+
+        // --- GLOBAL RESTOCK ALERTS ---
+        function checkRestockAlerts() {
+            const lowItems = state.items.filter(i => i.quantity <= (i.minThreshold || 0.5));
+            const alertBanner = document.getElementById('restock-alert-banner');
+            const alertText = document.getElementById('restock-alert-text');
+
+            if (lowItems.length > 0) {
+                alertBanner.classList.remove('hidden');
+                alertText.textContent = `Attention: ${lowItems.length} item(s) (${lowItems.slice(0, 2).map(i => i.name).join(', ')}${lowItems.length > 2 ? '...' : ''}) are running low on stock!`;
+            } else {
+                alertBanner.classList.add('hidden');
+            }
+        }
+
+        // --- ADD / EDIT ITEM MODAL HANDLERS ---
+        function openItemModal(itemId = null) {
+            const modal = document.getElementById('item-modal');
+            const title = document.getElementById('modal-title');
+            
+            if (itemId) {
+                const item = state.items.find(i => i.id === itemId);
+                if (!item) return;
+                title.textContent = "Edit Grocery Item";
+                document.getElementById('item-id').value = item.id;
+                document.getElementById('form-name').value = item.name;
+                document.getElementById('form-category').value = item.category;
+                document.getElementById('form-unit').value = item.unit;
+                document.getElementById('form-quantity').value = item.quantity;
+                document.getElementById('form-min-threshold').value = item.minThreshold || 0.5;
+                document.getElementById('form-cost').value = item.cost;
+                document.getElementById('form-date').value = item.date;
+            } else {
+                title.textContent = "Add Grocery Item";
+                document.getElementById('item-form').reset();
+                document.getElementById('item-id').value = '';
+                document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeItemModal() {
+            document.getElementById('item-modal').classList.add('hidden');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('item-id').value;
+            const name = document.getElementById('form-name').value.trim();
+            const category = document.getElementById('form-category').value;
+            const unit = document.getElementById('form-unit').value;
+            const quantity = parseFloat(document.getElementById('form-quantity').value);
+            const minThreshold = parseFloat(document.getElementById('form-min-threshold').value) || 0.5;
+            const cost = parseFloat(document.getElementById('form-cost').value);
+            const date = document.getElementById('form-date').value;
+
+            if (!name || isNaN(quantity) || isNaN(cost)) {
+                showToast("Please fill in all required fields accurately.", "error");
+                return;
+            }
+
+            if (id) {
+                // Update existing item
+                const index = state.items.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    state.items[index] = { id, name, category, unit, quantity, minThreshold, cost, date };
+                    showToast("Item updated successfully!");
+                }
+            } else {
+                // Add new item
+                const newItem = {
+                    id: Date.now().toString(),
+                    name,
+                    category,
+                    unit,
+                    quantity,
+                    minThreshold,
+                    cost,
+                    date
+                };
+                state.items.unshift(newItem);
+                showToast("Grocery item added to inventory!");
+            }
+
+            saveToLocalStorage();
+            renderAll();
+            closeItemModal();
+        }
+
+        function deleteItem(itemId) {
+            if (confirm("Are you sure you want to remove this item from your inventory?")) {
+                state.items = state.items.filter(i => i.id !== itemId);
+                saveToLocalStorage();
+                renderAll();
+                showToast("Item deleted.");
+            }
+        }
+
+        // --- CONSUMPTION LOGGING MODAL ---
+        function openConsumeModal(itemId) {
+            const item = state.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            document.getElementById('consume-item-id').value = item.id;
+            document.getElementById('consume-item-desc').textContent = `Log usage for "${item.name}" (Current stock: ${item.quantity} ${item.unit})`;
+            document.getElementById('consume-unit-label').textContent = item.unit;
+            document.getElementById('consume-amount').value = '';
+            document.getElementById('consume-modal').classList.remove('hidden');
+        }
+
+        function closeConsumeModal() {
+            document.getElementById('consume-modal').classList.add('hidden');
+        }
+
+        function handleConsumeSubmit(e) {
+            e.preventDefault();
+            const itemId = document.getElementById('consume-item-id').value;
+            const amount = parseFloat(document.getElementById('consume-amount').value);
+
+            const item = state.items.find(i => i.id === itemId);
+            if (!item || isNaN(amount)) return;
+
+            item.quantity = Math.max(0, parseFloat((item.quantity - amount).toFixed(2)));
+
+            saveToLocalStorage();
+            renderAll();
+            closeConsumeModal();
+            showToast(`Updated stock for ${item.name}!`);
+        }
+
+        // --- BUDGET & DATA SETTINGS HANDLERS ---
+        function saveBudgetSetting() {
+            const val = parseFloat(document.getElementById('setting-budget-input').value);
+            if (isNaN(val) || val < 0) {
+                showToast("Please enter a valid positive budget amount.", "error");
+                return;
+            }
+            state.budget = val;
+            saveToLocalStorage();
+            renderAll();
+            showToast("Monthly budget updated successfully!");
+        }
+
+        function loadSampleData() {
+            state = {
+                budget: 500,
+                items: sampleItems
+            };
+            document.getElementById('setting-budget-input').value = 500;
+            saveToLocalStorage();
+            renderAll();
+            showToast("Sample data loaded successfully!");
+        }
+
+        function clearAllData() {
+            if (confirm("Are you sure you want to clear all kitchen inventory data? This cannot be undone.")) {
+                state = { budget: 500, items: [] };
+                saveToLocalStorage();
+                renderAll();
+                showToast("All data cleared.");
+            }
+        }
+
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Kitchen_Pulse_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Backup exported as JSON!");
+        }
+
+        function importDataJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData && Array.isArray(importedData.items)) {
+                        state = importedData;
+                        saveToLocalStorage();
+                        renderAll();
+                        showToast("Data imported successfully!");
+                    } else {
+                        showToast("Invalid data structure in JSON file.", "error");
+                    }
+                } catch (err) {
+                    showToast("Failed to parse JSON file.", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+
+            if (type === "error") {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+    </script>
 </body>
 </html>
+```
